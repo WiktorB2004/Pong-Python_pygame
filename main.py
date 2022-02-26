@@ -4,17 +4,16 @@ import os
 # pygame initializations
 pygame.init()
 pygame.font.init()
-
 # Window variables
-WIDTH, HEIGHT = 750, 750
+WIDTH, HEIGHT = 800, 700
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Pong')
 BG = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')), (WIDTH, HEIGHT))
+BORDER = pygame.Rect(WIDTH//2 - 2, 0, 4, HEIGHT)
 
 # Color variables
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-
 # Classes
 class Paddle():
     pass
@@ -30,6 +29,7 @@ def main():
     
     def redraw_window(window):
         window.blit(BG, (0, 0))
+        pygame.draw.rect(WIN, WHITE, BORDER)
         pygame.display.update()
     
     while run:
