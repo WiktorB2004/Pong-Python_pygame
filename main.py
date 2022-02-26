@@ -27,6 +27,9 @@ class Paddle():
         self.x = x
         self.y = y
         self.lives = 3
+    
+    def move(self, vel):
+        self.y += vel
         
 class Ball():
     pass
@@ -55,14 +58,14 @@ def main():
         pressed_keys = pygame.key.get_pressed()
         # BLUE PADDLE MOVEMENT
         if pressed_keys[pygame.K_w] and blue_paddle.y + paddle_vel > 0: # UP
-            blue_paddle.y -= paddle_vel
+            blue_paddle.move(-paddle_vel)
         if pressed_keys[pygame.K_s] and blue_paddle.y + BLUE_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
-            blue_paddle.y += paddle_vel
+            blue_paddle.move(paddle_vel)
         # YELLOW PADDLE MOVEMENT
         if pressed_keys[pygame.K_UP] and yellow_paddle.y + paddle_vel > 0: # UP
-            yellow_paddle.y -= paddle_vel
+            yellow_paddle.move(-paddle_vel)
         if pressed_keys[pygame.K_DOWN] and yellow_paddle.y + YELLOW_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
-            yellow_paddle.y += paddle_vel
+            yellow_paddle.move(paddle_vel)
             
 
 # Main menu
