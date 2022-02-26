@@ -1,0 +1,1 @@
+Game assets were made by Nicolás A. Ortega (Deathsbreed) - DeathsbreedGames organization (http://deathsbreedgames.github.io/)
