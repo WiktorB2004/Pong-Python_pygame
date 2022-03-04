@@ -1,5 +1,4 @@
 # module imports
-from email.mime import image
 import pygame
 import os
 # pygame initializations
@@ -11,16 +10,15 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Pong')
 BG = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')), (WIDTH, HEIGHT))
 BORDER = pygame.Rect(WIDTH//2 - 2, 0, 4, HEIGHT)
-
 # Color variables
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-
 # Paddle variables
 YELLOW_PADDLE = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'yellow_paddle.png')), (100, 20)), 90)
 BLUE_PADDLE = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'blue_paddle.png')), (100, 20)), 90)
 paddle_vel = 5
-
+# Ball variables
+BALL = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'ball.png')), (25, 25))
 # Classes
 class Paddle():
     def __init__(self, x, y):
@@ -32,7 +30,9 @@ class Paddle():
         self.y += vel
         
 class Ball():
-    pass
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 # Main game loop
 def main():
@@ -41,10 +41,12 @@ def main():
     clock = pygame.time.Clock()
     blue_paddle = Paddle(5, HEIGHT//2 - BLUE_PADDLE.get_height()//2)
     yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2)
+    ball = Ball(WIDTH//2 - BALL.get_width()//2, HEIGHT//2 - BALL.get_height()//2)
     def redraw_window(window):
         window.blit(BG, (0, 0))
-        WIN.blit(BLUE_PADDLE, (blue_paddle.x, blue_paddle.y))
-        WIN.blit(YELLOW_PADDLE, (yellow_paddle.x, yellow_paddle.y))
+        window.blit(BLUE_PADDLE, (blue_paddle.x, blue_paddle.y))
+        window.blit(YELLOW_PADDLE, (yellow_paddle.x, yellow_paddle.y))
+        window.blit(BALL, (ball.x, ball.y))
         pygame.draw.rect(WIN, WHITE, BORDER)
         pygame.display.update()
     
@@ -53,8 +55,7 @@ def main():
         redraw_window(WIN)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                quit()
-                
+                quit()    
         pressed_keys = pygame.key.get_pressed()
         # BLUE PADDLE MOVEMENT
         if pressed_keys[pygame.K_w] and blue_paddle.y + paddle_vel > 0: # UP
@@ -66,7 +67,6 @@ def main():
             yellow_paddle.move(-paddle_vel)
         if pressed_keys[pygame.K_DOWN] and yellow_paddle.y + YELLOW_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
             yellow_paddle.move(paddle_vel)
-            
 
 # Main menu
 def main_menu():
