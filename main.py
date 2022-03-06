@@ -21,10 +21,13 @@ paddle_vel = 5
 BALL = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'ball.png')), (25, 25))
 # Classes
 class Paddle():
-    def __init__(self, x, y, img):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
         self.lives = 3
+        
+    def draw(self, win, paddle):
+        win.blit(paddle, (self.x, self.y))
     
     def move(self, vel):
         self.y += vel
@@ -64,13 +67,13 @@ def main():
     run = True
     FPS = 60
     clock = pygame.time.Clock()
-    blue_paddle = Paddle(5, HEIGHT//2 - BLUE_PADDLE.get_height()//2, BLUE_PADDLE)
-    yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2, YELLOW_PADDLE)
+    blue_paddle = Paddle(5, HEIGHT//2 - BLUE_PADDLE.get_height()//2)
+    yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2)
     ball = Ball(WIDTH//2 - BALL.get_width()//2, HEIGHT//2 - BALL.get_height()//2)
     def redraw_window(window):
         window.blit(BG, (0, 0))
-        window.blit(BLUE_PADDLE, (blue_paddle.x, blue_paddle.y))
-        window.blit(YELLOW_PADDLE, (yellow_paddle.x, yellow_paddle.y))
+        blue_paddle.draw(window, BLUE_PADDLE)
+        yellow_paddle.draw(window, YELLOW_PADDLE)
         ball.draw(window)
         pygame.draw.rect(WIN, WHITE, BORDER)
         pygame.display.update()
