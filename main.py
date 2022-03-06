@@ -21,7 +21,7 @@ paddle_vel = 5
 BALL = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'ball.png')), (25, 25))
 # Classes
 class Paddle():
-    def __init__(self, x, y):
+    def __init__(self, x, y, img):
         self.x = x
         self.y = y
         self.lives = 3
@@ -30,23 +30,48 @@ class Paddle():
         self.y += vel
         
 class Ball():
+    MAX_VEL = 5
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.mask = pygame.mask.from_surface(BALL)
+        self.x_vel = self.MAX_VEL
+        self.y_vel = 0
+        
+    def draw(self, win):
+        win.blit(BALL, (self.x, self.y))
+        
+    def move(self):
+        self.x += self.x_vel
+        self.y += self.y_vel
+
+# Functions
+
+def handle_paddle_movement(pressed_keys, yellow_paddle, blue_paddle):
+    # BLUE PADDLE MOVEMENT - LEFT
+    if pressed_keys[pygame.K_w] and blue_paddle.y + paddle_vel > 0: # UP
+        blue_paddle.move(-paddle_vel)
+    if pressed_keys[pygame.K_s] and blue_paddle.y + BLUE_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
+        blue_paddle.move(paddle_vel)
+    # YELLOW PADDLE MOVEMENT - RIGHT
+    if pressed_keys[pygame.K_UP] and yellow_paddle.y + paddle_vel > 0: # UP
+        yellow_paddle.move(-paddle_vel)
+    if pressed_keys[pygame.K_DOWN] and yellow_paddle.y + YELLOW_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
+        yellow_paddle.move(paddle_vel)
 
 # Main game loop
 def main():
     run = True
     FPS = 60
     clock = pygame.time.Clock()
-    blue_paddle = Paddle(5, HEIGHT//2 - BLUE_PADDLE.get_height()//2)
-    yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2)
+    blue_paddle = Paddle(5, HEIGHT//2 - BLUE_PADDLE.get_height()//2, BLUE_PADDLE)
+    yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2, YELLOW_PADDLE)
     ball = Ball(WIDTH//2 - BALL.get_width()//2, HEIGHT//2 - BALL.get_height()//2)
     def redraw_window(window):
         window.blit(BG, (0, 0))
         window.blit(BLUE_PADDLE, (blue_paddle.x, blue_paddle.y))
         window.blit(YELLOW_PADDLE, (yellow_paddle.x, yellow_paddle.y))
-        window.blit(BALL, (ball.x, ball.y))
+        ball.draw(window)
         pygame.draw.rect(WIN, WHITE, BORDER)
         pygame.display.update()
     
@@ -57,16 +82,9 @@ def main():
             if event.type == pygame.QUIT:
                 quit()    
         pressed_keys = pygame.key.get_pressed()
-        # BLUE PADDLE MOVEMENT
-        if pressed_keys[pygame.K_w] and blue_paddle.y + paddle_vel > 0: # UP
-            blue_paddle.move(-paddle_vel)
-        if pressed_keys[pygame.K_s] and blue_paddle.y + BLUE_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
-            blue_paddle.move(paddle_vel)
-        # YELLOW PADDLE MOVEMENT
-        if pressed_keys[pygame.K_UP] and yellow_paddle.y + paddle_vel > 0: # UP
-            yellow_paddle.move(-paddle_vel)
-        if pressed_keys[pygame.K_DOWN] and yellow_paddle.y + YELLOW_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
-            yellow_paddle.move(paddle_vel)
+        
+        handle_paddle_movement(pressed_keys, yellow_paddle, blue_paddle)
+        ball.move()
 
 # Main menu
 def main_menu():
@@ -80,6 +98,7 @@ def main_menu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                break
             if event.type == pygame.MOUSEBUTTONDOWN:
                 main()
     pygame.quit()
