@@ -21,17 +21,23 @@ paddle_vel = 5
 BALL = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'ball.png')), (25, 25))
 # Classes
 class Paddle():
-    def __init__(self, x, y):
+    def __init__(self, x, y, img):
         self.x = x
         self.y = y
         self.lives = 3
+        self.img = img    
+    
+    def get_width(self):
+        return self.img.get_width()
+    
+    def get_height(self):
+        return self.img.get_height()   
         
     def draw(self, win, paddle):
         win.blit(paddle, (self.x, self.y))
-    
+        
     def move(self, vel):
         self.y += vel
-        
 class Ball():
     MAX_VEL = 5
     def __init__(self, x, y):
@@ -61,14 +67,41 @@ def handle_paddle_movement(pressed_keys, yellow_paddle, blue_paddle):
         yellow_paddle.move(-paddle_vel)
     if pressed_keys[pygame.K_DOWN] and yellow_paddle.y + YELLOW_PADDLE.get_height() + paddle_vel < HEIGHT: # DOWN
         yellow_paddle.move(paddle_vel)
-
+        
+def handle_collision(ball, left_paddle, right_paddle):
+    if ball.y >= HEIGHT:
+        ball.y_vel *= -1
+    elif ball.y <= 0:
+        ball.y_vel *= -1
+        
+    if ball.x_vel < 0:
+        if ball.y >= left_paddle.y and ball.y <= left_paddle.y + left_paddle.get_height():
+            if ball.x <= left_paddle.x + left_paddle.get_width():
+                ball.x_vel *= -1
+                
+                middle_y = left_paddle.y + left_paddle.get_height() // 2
+                difference_in_y = middle_y - ball.y
+                reduction_factor = (left_paddle.get_height() // 2) // ball.MAX_VEL
+                y_vel = difference_in_y // reduction_factor
+                ball.y_vel = -y_vel
+    else:
+        if ball.y >= right_paddle.y and ball.y <= right_paddle.y + right_paddle.get_height():
+            if ball.x >= right_paddle.x - right_paddle.get_width():
+                ball.x_vel *= -1
+                
+                middle_y = right_paddle.y + right_paddle.get_height() // 2
+                difference_in_y = middle_y - ball.y
+                reduction_factor = (right_paddle.get_height() // 2) // ball.MAX_VEL
+                y_vel = difference_in_y // reduction_factor
+                ball.y_vel = -y_vel
+    
 # Main game loop
 def main():
     run = True
     FPS = 60
     clock = pygame.time.Clock()
-    blue_paddle = Paddle(5, HEIGHT//2 - BLUE_PADDLE.get_height()//2)
-    yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2)
+    blue_paddle = Paddle(5, HEIGHT//2 - BLUE_PADDLE.get_height()//2, BLUE_PADDLE)
+    yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2, YELLOW_PADDLE)
     ball = Ball(WIDTH//2 - BALL.get_width()//2, HEIGHT//2 - BALL.get_height()//2)
     def redraw_window(window):
         window.blit(BG, (0, 0))
@@ -87,6 +120,7 @@ def main():
         pressed_keys = pygame.key.get_pressed()
         
         handle_paddle_movement(pressed_keys, yellow_paddle, blue_paddle)
+        handle_collision(ball, blue_paddle, yellow_paddle)
         ball.move()
 
 # Main menu
