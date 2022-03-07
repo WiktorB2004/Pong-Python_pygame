@@ -43,7 +43,6 @@ class Ball():
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.mask = pygame.mask.from_surface(BALL)
         self.x_vel = self.MAX_VEL
         self.y_vel = 0
         
@@ -55,7 +54,6 @@ class Ball():
         self.y += self.y_vel
 
 # Functions
-
 def handle_paddle_movement(pressed_keys, yellow_paddle, blue_paddle):
     # BLUE PADDLE MOVEMENT - LEFT
     if pressed_keys[pygame.K_w] and blue_paddle.y + paddle_vel > 0: # UP
@@ -94,7 +92,14 @@ def handle_collision(ball, left_paddle, right_paddle):
                 reduction_factor = (right_paddle.get_height() // 2) // ball.MAX_VEL
                 y_vel = difference_in_y // reduction_factor
                 ball.y_vel = -y_vel
-    
+
+def game_over(win):
+        font = pygame.font.SysFont('comicsans', 32)
+        game_over_label = font.render('Game over...', 1, WHITE)
+        win.blit(game_over_label, (WIDTH//2 - game_over_label.get_width()//2, HEIGHT//2 - game_over_label.get_height()//2))
+        pygame.display.update()
+        pygame.time.delay(3000)
+
 # Main game loop
 def main():
     run = True
@@ -104,7 +109,12 @@ def main():
     yellow_paddle = Paddle(WIDTH - YELLOW_PADDLE.get_width() - 5, HEIGHT//2 - YELLOW_PADDLE.get_height()//2, YELLOW_PADDLE)
     ball = Ball(WIDTH//2 - BALL.get_width()//2, HEIGHT//2 - BALL.get_height()//2)
     def redraw_window(window):
+        lives_font = pygame.font.SysFont('comicsans', 24)
+        left_lives_label = lives_font.render(f'Lives: {blue_paddle.lives}', 1, WHITE)
+        right_lives_label = lives_font.render(f'Lives: {yellow_paddle.lives}', 1, WHITE)
         window.blit(BG, (0, 0))
+        window.blit(left_lives_label, (10, 10))
+        window.blit(right_lives_label, (WIDTH - right_lives_label.get_width() - 10, 10))
         blue_paddle.draw(window, BLUE_PADDLE)
         yellow_paddle.draw(window, YELLOW_PADDLE)
         ball.draw(window)
@@ -122,6 +132,15 @@ def main():
         handle_paddle_movement(pressed_keys, yellow_paddle, blue_paddle)
         handle_collision(ball, blue_paddle, yellow_paddle)
         ball.move()
+        if ball.x < 0:
+            blue_paddle.lives -= 1
+            ball = Ball(WIDTH//2 - BALL.get_width()//2, HEIGHT//2 - BALL.get_height()//2)
+        if ball.x > WIDTH:
+            yellow_paddle.lives -= 1
+            ball = Ball(WIDTH//2 - BALL.get_width()//2, HEIGHT//2 - BALL.get_height()//2)
+        if blue_paddle.lives == 0 or yellow_paddle.lives == 0:
+            game_over(WIN)
+            break
 
 # Main menu
 def main_menu():
